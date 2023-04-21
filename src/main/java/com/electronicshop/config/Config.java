@@ -56,25 +56,25 @@ public class Config extends WebSecurityConfigurerAdapter {
 		
 		http.httpBasic().disable();
 		
-		http.csrf().disable()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and()
-		.authorizeRequests()
-		.antMatchers("/*").permitAll();
-		
 //		http.csrf().disable()
 //		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //		.and()
 //		.authorizeRequests()
-//		.antMatchers("/auth/login").permitAll()
-//		.anyRequest().authenticated();
-//		
-//		http.exceptionHandling().authenticationEntryPoint((request,response,ex)->{
-//			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,ex.getMessage());
-//			System.out.println(ex.getMessage());
-//		});
-//		
-//		http.addFilterBefore(jwtTokenfilter, UsernamePasswordAuthenticationFilter.class); 
+//		.antMatchers("/*").permitAll();
+		
+		http.csrf().disable()
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		.and()
+		.authorizeRequests()
+		.antMatchers("/auth/login").permitAll()
+		.anyRequest().authenticated();
+		
+		http.exceptionHandling().authenticationEntryPoint((request,response,ex)->{
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,ex.getMessage());
+			System.out.println(ex.getMessage());
+		});
+		
+		http.addFilterBefore(jwtTokenfilter, UsernamePasswordAuthenticationFilter.class); 
 		
 		
 	}

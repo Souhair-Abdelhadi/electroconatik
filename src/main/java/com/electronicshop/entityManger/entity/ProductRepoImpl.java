@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.electronicshop.entities.Brand;
 import com.electronicshop.entities.Product;
 import com.electronicshop.entityManger.customInterface.ProductRepoCustom;
+import com.electronicshop.pojos.FilterProductsPojo;
 import com.electronicshop.pojos.ProductFilterPojo;
 import com.electronicshop.pojos.ProductPojo;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,8 +25,7 @@ public class ProductRepoImpl implements ProductRepoCustom {
 	
 	
 	@Override
-	public List<Product
-	> customFindMethod(String filter) {
+	public List<Product> customFindMethod(String filter) {
 		System.out.println(filter);
 		ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,7 +41,7 @@ public class ProductRepoImpl implements ProductRepoCustom {
 			e.printStackTrace();
 		}
 		
-		String query = "select p from Product p, Brand b,Variant v where p.brand.id = b.id AND p.id = v.produit.id AND 1=1   ";
+		String query = "select p from Product p,Variant v where p.id = v.produit.id AND 1=1   ";
 		
 		String conditions = "";
 		
@@ -49,10 +49,10 @@ public class ProductRepoImpl implements ProductRepoCustom {
 		
 		if(productFilterPojo.getTitle() != null && productFilterPojo.getTitle().trim().length() > 0 ) {
 			System.out.println("inside title condition");
-			conditions += " AND p.title='"+productFilterPojo.getTitle()+"' ";
+			conditions += " AND p.title='%"+productFilterPojo.getTitle()+"%' ";
 		}
 		if(productFilterPojo.getBrand() != null ) {
-			conditions+=" AND b.name='"+productFilterPojo.getBrand()+"' ";
+			conditions+=" AND b.name='%"+productFilterPojo.getBrand()+"%' ";
 		}
 		if(productFilterPojo.getEtat() != null   ) {
 			conditions+=" AND v.sale="+productFilterPojo.getEtat();
@@ -82,5 +82,43 @@ public class ProductRepoImpl implements ProductRepoCustom {
 		
 		
 	}
+
+
+	@Override
+	public List<Product> customFindMethod(FilterProductsPojo filterProductsPojo) {
+		System.out.println(filterProductsPojo.toString());
+
+		
+		String query = "select DISTINCT(p) from Product p,Variant v where p.id = v.produit.id AND 1=1   ";
+		
+		String conditions = "";
+		
+		System.out.println("title : "+ filterProductsPojo.getTitle());
+		
+		if(filterProductsPojo.getTitle() != null && filterProductsPojo.getTitle().trim().length() > 0 ) {
+			System.out.println("inside title condition");
+			conditions += " AND p.title like'%"+filterProductsPojo.getTitle().trim()+"%' ";
+		}
+		if(filterProductsPojo.getBrand() != null && filterProductsPojo.getBrand().trim().length() > 0 ) {
+			conditions+=" AND p.brand like '%"+filterProductsPojo.getBrand().trim()+"%' ";
+		}
+		if(filterProductsPojo.getType() != null && filterProductsPojo.getType().trim().length() > 0 ) {
+			conditions+=" AND p.type like'%"+filterProductsPojo.getType().trim()+"%' ";
+		}
+		if(filterProductsPojo.getNouveau() != null && filterProductsPojo.getNouveau() ) {
+			conditions+=" AND v.sale="+filterProductsPojo.getNouveau();
+		}
+		
+		query = query + conditions;
+		
+		System.out.println("conditions : "+conditions);
+		System.out.println("query : "+query);
+		
+		List<Product> products =  (List<Product>) entityManager.createQuery(query,Product.class).getResultList();
+		System.out.println("products searched size : "+products.size());
+		return products;
+	}
+
+	
 
 }

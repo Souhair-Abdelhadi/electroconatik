@@ -26,6 +26,7 @@ import com.electronicshop.entities.Product;
 import com.electronicshop.entities.ProductImage;
 import com.electronicshop.entities.Variant;
 import com.electronicshop.entityManger.entity.ProductRepoImpl;
+import com.electronicshop.pojos.FilterProductsPojo;
 import com.electronicshop.pojos.ProductFilterPojo;
 import com.electronicshop.pojos.ProductPojo;
 import com.electronicshop.pojos.ProductVariantsPojo;
@@ -165,6 +166,11 @@ public class ProductService implements IProduct {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 		}		
 		
+	}
+	
+	@Override
+	public ResponseEntity<Object> getFilteredProducts(FilterProductsPojo filterProductsPojo) {
+			return ResponseEntity.ok(productRepo.customFindMethod(filterProductsPojo));
 	}
 	
 	private Product pojoToProduct(ProductPojo productPojo,boolean check) {
@@ -392,7 +398,7 @@ public class ProductService implements IProduct {
 				System.out.println("length of images : "+variant.getImages().size());
 				Set<ProductImage> productImages = new HashSet<>();
 				variant.getImages().forEach(image -> {
-					if(image.getSrc() == null || image.getSrc().isEmpty()) 
+					if(image == null || image.getSrc() == null || image.getSrc().isEmpty()) 
 						return;
 					String filePath = storageService.uploadBase64ProductImage(image.getSrc());
 					if(filePath != null) {

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.electronicshop.pojos.FilterProductsPojo;
 import com.electronicshop.pojos.ProductImagePojo;
 import com.electronicshop.pojos.ProductPojo;
 import com.electronicshop.pojos.ProductVariantsPojo;
@@ -120,6 +121,20 @@ public class ProductController {
 			 Float price, Integer quantity
 			){
 		return productService.getFilteredProducts(title, brand, etat, discount, color, size, price, quantity);
+	}
+	
+	@GetMapping("/filterProducts2")
+	ResponseEntity<Object> getFiltredProduct2(@RequestParam String filter){
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			FilterProductsPojo filterProductsPojo = mapper.readValue(filter, FilterProductsPojo.class);
+			return productService.getFilteredProducts(filterProductsPojo);
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No object with params was provided");
+		}
+		
 	}
 	
 	

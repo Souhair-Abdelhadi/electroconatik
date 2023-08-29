@@ -5,6 +5,7 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -152,8 +153,9 @@ public class StorageService implements IStorageService {
         }
         System.out.println(base64);
         String[] base = base64.split(",");
-        byte[] imageBytes = Base64.getDecoder().decode(base[1]);
-        ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
+        System.out.println(base[1]);
+        byte[] imageBytes = Base64.getDecoder().decode(base[1].getBytes(StandardCharsets.UTF_8));
+//        ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
         
         try {
         	File dir = new File(PRODUCT_FOLDER_PATH);
@@ -170,10 +172,16 @@ public class StorageService implements IStorageService {
 	        		System.out.println(" path : "+ dir.getAbsolutePath());
 	        	}
 	        }
-        	BufferedImage bImage = ImageIO.read(bis);
-			ImageIO.write(bImage, ext[1], new File(PRODUCT_FOLDER_PATH+timestmp+"."+ext[1]));
+	        System.out.println("--------------------Image info--------------------------");
+	        System.out.println(ext[1]);
+	        System.out.println("Path : "+PRODUCT_FOLDER_PATH+timestmp+"."+ext[1]);
+	        System.out.println("--------------------------------------------------------");
+//        	BufferedImage bImage = ImageIO.read(bis);
+//			ImageIO.write(bImage, ext[1], new File(PRODUCT_FOLDER_PATH+timestmp+"."+ext[1]));
+	        Path destinationFile = Paths.get(PRODUCT_FOLDER_PATH,timestmp+"."+ext[1]);
+	        Files.write(destinationFile, imageBytes);
 			return PRODUCT_FOLDER_PATH+timestmp+"."+ext[1];
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println(e+ " error in upload");
